@@ -2,16 +2,32 @@ const express = require("express");
 const path = require("node:path");
 const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
-const db = require("../db/db");
+const pool = require("../db/pool");
+const passport = require("passport");
+const session = require("express-session");
+const authRoutes = require("../routes/auth");
 
 const app = express();
 
 // Middleware for url encoded data
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 
 // Set up view engine
 app.set("views", path.join(__dirname, "../views"));
 app.set("view engine", "ejs");
+
+// Session middleware
+app.use(
+  session({
+    secret: "cats",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+// Passport middleware
+app.use(passport.session());
+require("../config/passport")(passport);
 
 // Validate and sanitze form
 const validateSignUp = [
@@ -38,6 +54,12 @@ const validateSignUp = [
 app.get("/", (req, res) => {
   res.send("Hello world!");
 });
+app.get("/loginSuccess", (req, res) => {
+  res.send("log in successful!");
+});
+app.get("/loginFail", (req, res) => {
+  res.send("log in failed!");
+});
 app.get("/sign-up", (req, res) => res.render("signUp", { errors: [] }));
 // POST sign-up route
 app.post("/sign-up", validateSignUp, async (req, res) => {
@@ -59,7 +81,7 @@ app.post("/sign-up", validateSignUp, async (req, res) => {
 
     const values = [username, fullName, hashedPassword, secret === "admin123"];
 
-    const result = await db.query(query, values);
+    const result = await pool.query(query, values);
     res.send("Sign up successful!Your user ID is: " + result.rows[0].id);
   } catch (err) {
     console.error(err);
@@ -72,6 +94,8 @@ app.post("/sign-up", validateSignUp, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+app.use("/auth", authRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
