@@ -22,4 +22,11 @@ router.post("/login", (req, res, next) => {
   })(req, res, next);
 });
 
+// Logout
+router.get("/logout", (req, res, next) => {
+  req.logout((err) => {
+    if (err) return next(err);
+    res.redirect("/auth/login");
+  });
+});
 module.exports = router;

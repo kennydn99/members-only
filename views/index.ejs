@@ -9,7 +9,33 @@
     <h1>This is the home dashboard.</h1>
     <% if (username) { %>
     <p>Welcome <span style="color: green"><%= username %></span></p>
-    <a href="/newMessage">Create a new message</a>
+    <a href="/messages/new">Create a new message</a>
+    <br />
+    <a href="/auth/logout">Logout</a>
+    <!-- Logout link -->
+    <% } else { %>
+    <a href="/auth/login">Login</a>
+    <% } %>
+
+    <h2>Member Messages:</h2>
+    <% if (messages.length > 0) { %>
+    <ul>
+      <% messages.forEach((msg) => { %>
+      <li>
+        <h3><%= msg.title %></h3>
+        <p><%= msg.text %></p>
+        <% if (username) { %>
+        <!-- Show author and date only to logged-in users -->
+        <p>
+          <small>By: <%= msg.full_name %></small><br />
+          <small>Date: <%= msg.timestamp.toDateString() %></small>
+        </p>
+        <% } %>
+      </li>
+      <% }); %>
+    </ul>
+    <% } else { %>
+    <p>No messages yet. Be the first to post!</p>
     <% } %>
   </body>
 </html>
