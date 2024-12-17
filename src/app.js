@@ -52,14 +52,9 @@ const validateSignUp = [
 
 // Routes
 app.get("/", (req, res) => {
-  res.send("Hello world!");
+  res.render("index", { username: req.user ? req.user.username : null });
 });
-app.get("/loginSuccess", (req, res) => {
-  res.send("log in successful!");
-});
-app.get("/loginFail", (req, res) => {
-  res.send("log in failed!");
-});
+
 app.get("/sign-up", (req, res) => res.render("signUp", { errors: [] }));
 // POST sign-up route
 app.post("/sign-up", validateSignUp, async (req, res) => {
@@ -76,8 +71,8 @@ app.post("/sign-up", validateSignUp, async (req, res) => {
 
     // Insert user into db
     const query = `INSERT INTO users (username, full_name, password, member_status)
-      VALUES ($1, $2, $3, $4)
-      RETURNING id;`;
+    VALUES ($1, $2, $3, $4)
+    RETURNING id;`;
 
     const values = [username, fullName, hashedPassword, secret === "admin123"];
 
@@ -96,6 +91,19 @@ app.post("/sign-up", validateSignUp, async (req, res) => {
 });
 
 app.use("/auth", authRoutes);
+
+// Middleware function to ensure only logged in users can access the newMessage route
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect("/auth/login");
+}
+
+// Route for creating new Message
+app.get("/newMessage", ensureAuthenticated, (req, res) => {
+  res.render("newMessage");
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

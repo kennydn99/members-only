@@ -5,12 +5,21 @@ const router = Router();
 router.get("/login", (req, res) => res.render("login", { error: [] }));
 
 // Post login
-router.post(
-  "/login",
-  passport.authenticate("local", {
-    successRedirect: "/loginSuccess",
-    failureRedirect: "/loginFail",
-  })
-);
+router.post("/login", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      return next(err); // Handle server errors
+    }
+    if (!user) {
+      return res.render("login", { error: info.message }); // Pass error to the view
+    }
+    req.logIn(user, (err) => {
+      if (err) {
+        return next(err);
+      }
+      return res.redirect("/");
+    });
+  })(req, res, next);
+});
 
 module.exports = router;
