@@ -5,7 +5,7 @@ const router = Router();
 router.get("/", async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT messages.title, messages.text, messages.timestamp, users.full_name
+      `SELECT messages.id, messages.title, messages.text, messages.timestamp, users.full_name
         FROM messages 
         JOIN users ON messages.author_id = users.id
         ORDER BY messages.timestamp DESC`
@@ -14,6 +14,7 @@ router.get("/", async (req, res) => {
 
     res.render("index", {
       username: req.user ? req.user.username : null, // Check if user is logged in
+      admin: req.user ? req.user.member_status : false,
       messages,
     });
   } catch (error) {

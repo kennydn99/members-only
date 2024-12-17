@@ -48,7 +48,7 @@ router.post("/", validateSignUp, async (req, res) => {
     const values = [username, fullName, hashedPassword, secret === "admin123"];
 
     const result = await pool.query(query, values);
-    res.send("Sign up successful!Your user ID is: " + result.rows[0].id);
+    res.redirect("/auth/login");
   } catch (err) {
     console.error(err);
     // Handle errors (e.g., username already exists)

@@ -30,4 +30,23 @@ router.post("/new", ensureAuthenticated, async (req, res) => {
   }
 });
 
+// Delete message route ( for admins)
+router.post("/delete/:id", ensureAuthenticated, async (req, res) => {
+  const messageId = req.params.id;
+
+  try {
+    // check if admin
+    if (!req.user.member_status) {
+      return res.status(403).send("Unauthorized: Admin access only");
+    }
+
+    // Delete message from db
+    await pool.query("DELETE FROM messages WHERE id = $1", [messageId]);
+    res.redirect("/");
+  } catch (error) {
+    console.error("Error deleting message:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 module.exports = router;
