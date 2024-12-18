@@ -12,6 +12,9 @@ const app = express();
 // Middleware for url encoded data
 app.use(express.urlencoded({ extended: false }));
 
+// Serve static files from public dir
+app.use(express.static(path.join(__dirname, "../public")));
+
 // Set up view engine
 app.set("views", path.join(__dirname, "../views"));
 app.set("view engine", "ejs");
@@ -28,6 +31,12 @@ app.use(
 // Passport middleware
 app.use(passport.session());
 require("../config/passport")(passport);
+
+// Pass usernames to all views (for navbar)
+app.use((req, res, next) => {
+  res.locals.username = req.user ? req.user.username : null;
+  next();
+});
 
 // Routes
 app.use("/", indexRoutes);

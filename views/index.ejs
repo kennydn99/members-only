@@ -4,17 +4,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home</title>
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <h1>This is the home dashboard.</h1>
+    <%- include('partials/nav') %>
+    <h1>Members Only Message Board</h1>
     <% if (username) { %>
-    <p>Welcome <span style="color: green"><%= username %></span></p>
-    <a href="/messages/new">Create a new message</a>
-    <br />
-    <a href="/auth/logout">Logout</a>
-    <!-- Logout link -->
+    <div class="steps">
+      <p>Welcome <span style="color: green"><%= username %></span>!</p>
+      <form
+        class="single-btn-form"
+        action="/messages/new"
+        method="GET"
+        style="display: inline"
+      >
+        <button type="submit">Create a new message</button>
+      </form>
+    </div>
+
     <% } else { %>
-    <a href="/auth/login">Login</a>
+    <p class="steps">
+      <a href="/auth/login">Log in</a> if you're already a member.
+      <a href="/sign-up">Sign Up</a> if you'd like to join!
+    </p>
     <% } %>
 
     <h2>Member Messages:</h2>
@@ -22,23 +34,26 @@
     <ul>
       <% messages.forEach((msg) => { %>
       <li>
-        <h3><%= msg.title %></h3>
-        <p><%= msg.text %></p>
-        <% if (username) { %>
-        <!-- Show author and date only to logged-in users -->
-        <p>
-          <small>By: <%= msg.full_name %></small><br />
-          <small>Date: <%= msg.timestamp.toDateString() %></small>
-        </p>
-        <% if (admin) { %>
-        <form
-          action="/messages/delete/<%= msg.id %>"
-          method="POST"
-          style="display: inline"
-        >
-          <button type="submit">Delete</button>
-        </form>
-        <% } %> <% } %>
+        <div class="message-card">
+          <h3><%= msg.title %></h3>
+          <p><%= msg.text %></p>
+          <% if (username) { %>
+          <!-- Show author and date only to logged-in users -->
+          <p>
+            <small>By: <%= msg.full_name %></small>
+            <small>Date: <%= msg.timestamp.toDateString() %></small>
+          </p>
+          <% if (admin) { %>
+          <form
+            class="single-btn-form"
+            action="/messages/delete/<%= msg.id %>"
+            method="POST"
+            style="display: inline"
+          >
+            <button type="submit">Delete</button>
+          </form>
+          <% } %> <% } %>
+        </div>
       </li>
       <% }); %>
     </ul>

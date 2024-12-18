@@ -4,8 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create New Message</title>
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
+    <%- include('partials/nav') %>
     <h1>Create a New Message</h1>
     <form action="/messages/new" method="POST">
       <label for="title">Title:</label>
